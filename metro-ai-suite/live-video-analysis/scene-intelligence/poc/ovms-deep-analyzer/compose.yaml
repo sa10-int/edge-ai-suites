@@ -1,0 +1,29 @@
+services:
+  ovms-qwen35:
+    image: ${OVMS_IMAGE:-openvino/model_server:latest}
+    container_name: ovms-qwen35-deep-analyzer-poc
+    restart: unless-stopped
+    ports:
+      - "${OVMS_REST_PORT:-8000}:8000"
+      - "${OVMS_GRPC_PORT:-9000}:9000"
+    devices:
+      - /dev/dri:/dev/dri
+    volumes:
+      - ${POC_MODEL_DIR:-../../ov_models/cpu/Qwen3.5-2B-int4-ov}:/model:ro
+    command:
+      - --model_path
+      - /model
+      - --model_name
+      - ${OVMS_MODEL_NAME:-qwen3_5_deep_analyzer}
+      - --rest_port
+      - "8000"
+      - --port
+      - "9000"
+      - --task
+      - text_generation
+      - --target_device
+      - ${OVMS_TARGET_DEVICE:-CPU}
+      - --log_level
+      - ${OVMS_LOG_LEVEL:-INFO}
+      - --cache_dir
+      - /tmp/ovms_cache
